@@ -1,6 +1,5 @@
 import os
 import pypdf
-from utils.dropfile import get_dropped_file
 import tkinter as tk
 from tkinter import filedialog, messagebox
 def count_pdfs_and_pages(folder_path):
