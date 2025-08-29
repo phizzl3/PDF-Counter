@@ -1,13 +1,12 @@
 import os
 import pypdf
 from utils.dropfile import get_dropped_file
-
-
+import tkinter as tk
+from tkinter import filedialog, messagebox
 def count_pdfs_and_pages(folder_path):
     total_files = 0
     total_pages = 0
-
-    print()
+    exceptions = []
 
     # Walk through all subdirectories
     for root, _, files in os.walk(folder_path):
@@ -20,18 +19,37 @@ def count_pdfs_and_pages(folder_path):
                         reader = pypdf.PdfReader(pdf_file)
                         total_pages += len(reader.pages)
                 except Exception as e:
-                    print(
-                        f"Could not read {file_path}: {e}. Add it manually if needed.\n"
-                    )
+                    exceptions.append(f"{file_path}: {e}")
 
-    print(f"Total PDF files found: {total_files}")
-    print(f"Total pages across all PDFs: {total_pages}\n")
+    return total_files, total_pages, exceptions
 
+def select_folder():
+    folder = filedialog.askdirectory()
+    result_text.set("Scanning...")
+    root.update_idletasks()
+    if folder:
+        total_files, total_pages, exceptions = count_pdfs_and_pages(folder)
+        result = (
+            f"Total PDF files found: {total_files}\n"
+            f"Total pages across all PDFs: {total_pages}\n"
+        )
+        if exceptions:
+            result += "\nFiles with errors (Not included in total count):\n" + "\n".join(exceptions)
+        result_text.set(result)
+    else:
+        messagebox.showerror("Error", "No folder selected.")
 
 if __name__ == "__main__":
-    folder = get_dropped_file()
-    if os.path.isdir(folder):
-        print(f"\nScanning folder: {folder}")
-        count_pdfs_and_pages(folder)
-    else:
-        print("Invalid folder path.")
+    root = tk.Tk()
+    root.title("PDF Counter")
+
+    instruction_label = tk.Label(root, text="\nPlease select the folder to scan for PDF files:", font=("Arial", 12))
+    instruction_label.pack(padx=10, pady=(10, 0))
+    result_text = tk.StringVar()
+    result_label = tk.Label(root, textvariable=result_text, justify="left", font=("Arial", 14))
+    result_label.pack(padx=10, pady=10)
+
+    select_button = tk.Button(root, text="Select Folder", command=select_folder, font=("Arial", 12))
+    select_button.pack(padx=10, pady=10)
+
+    root.mainloop()
