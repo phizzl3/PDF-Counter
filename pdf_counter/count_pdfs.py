@@ -1,5 +1,6 @@
 import os
 import pypdf
+from utils.dropfile import get_dropped_file
 
 
 def count_pdfs_and_pages(folder_path):
@@ -28,7 +29,7 @@ def count_pdfs_and_pages(folder_path):
 
 
 if __name__ == "__main__":
-    folder = input("\nEnter the folder path containing PDF files: ").strip('"')
+    folder = get_dropped_file()
     if os.path.isdir(folder):
         print(f"\nScanning folder: {folder}")
         count_pdfs_and_pages(folder)
